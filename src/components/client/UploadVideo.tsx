@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { FiUpload } from "react-icons/fi";
-import { Analysis } from "./Inference";
+import type { Analysis } from "./Inference";
 
 interface UploadVideoProps {
   apiKey: string;
@@ -33,11 +33,15 @@ function UploadVideo({ apiKey, onAnalysis }: UploadVideoProps) {
       });
 
       if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error?.error || "Failed to get upload URL");
+        const errorData = (await res.json()) as { error?: string };
+        throw new Error(errorData?.error ?? "Failed to get upload URL");
       }
 
-      const { url, fileId, key, contentType } = await res.json();
+      const { url, key, contentType } = (await res.json()) as {
+        url: string;
+        key: string;
+        contentType: string;
+      };
 
       console.log(`Uploading file: ${file.name}, Size: ${file.size} bytes, Type: ${contentType}`);
 
@@ -67,14 +71,14 @@ function UploadVideo({ apiKey, onAnalysis }: UploadVideoProps) {
       });
 
       if (!analysisRes.ok) {
-        const error = await analysisRes.json();
-        throw new Error(error?.error || "Failed to analyze video");
+        const errorData = (await analysisRes.json()) as { error?: string };
+        throw new Error(errorData?.error ?? "Failed to analyze video");
       }
 
-      const analysis = await analysisRes.json();
+      const analysisData = (await analysisRes.json()) as Analysis;
 
-      console.log("Analysis: ", analysis);
-      onAnalysis(analysis);
+      console.log("Analysis: ", analysisData);
+      onAnalysis(analysisData);
       setStatus("idle");
     } catch (error) {
       setError(error instanceof Error ? error.message : "Upload failed");
@@ -92,7 +96,7 @@ function UploadVideo({ apiKey, onAnalysis }: UploadVideoProps) {
           className="hidden"
           onChange={(e) => {
             const file = e.target.files?.[0];
-            if (file) handleUpload(file);
+            if (file) void handleUpload(file);
           }}
           id="video-upload"
         />

@@ -26,9 +26,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid API key" }, { status: 401 });
     }
 
-    const { fileType } = await req.json();
+    const { fileType } = (await req.json()) as { fileType: string | undefined };
 
-    if (!fileType || !fileType.match(/\.(mp4|mov|avi)$/i)) {
+    if (!fileType?.match(/\.(mp4|mov|avi)$/i)) {
       return NextResponse.json(
         { error: "Invalid file type. Only .mp4, .mov, .avi are supported" },
         { status: 400 },
@@ -72,7 +72,7 @@ export async function POST(req: Request) {
       key,
       contentType,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Upload error: ", error);
     return NextResponse.json(
       { error: "Internal server error" },

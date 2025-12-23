@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { loginSchema, LoginSchema } from "~/schemas/auth";
+import { loginSchema, type LoginSchema } from "~/schemas/auth";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -39,7 +39,7 @@ export default function LoginPage() {
             : "Something went wrong",
         );
       }
-    } catch (error) {
+    } catch {
       setError("Something went wrong");
     } finally {
       setLoading(false);
@@ -121,7 +121,7 @@ export default function LoginPage() {
             </button>
 
             <p className="text-center text-sm text-gray-600">
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <Link
                 className="font-medium text-gray-800 hover:text-gray-700"
                 href="/signup"

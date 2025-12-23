@@ -1,7 +1,6 @@
 import { HeadObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import {
   InvokeEndpointCommand,
-  SageMakerRuntime,
   SageMakerRuntimeClient,
 } from "@aws-sdk/client-sagemaker-runtime";
 import { NextResponse } from "next/server";
@@ -31,7 +30,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid API key" }, { status: 401 });
     }
 
-    const { key } = await req.json();
+    const { key } = (await req.json()) as { key: string | undefined };
 
     if (!key) {
       return NextResponse.json({ error: "Key is required" }, { status: 400 });
@@ -89,7 +88,7 @@ export async function POST(req: Request) {
           { status: 400 },
         );
       }
-    } catch (s3Error) {
+    } catch (s3Error: unknown) {
       console.error("S3 file verification failed:", s3Error);
       return NextResponse.json(
         { error: "Video file not found in storage. Please re-upload." },
@@ -115,7 +114,7 @@ export async function POST(req: Request) {
     });
 
     const response = await sagemakerClient.send(command);
-    const analysis = JSON.parse(new TextDecoder().decode(response.Body));
+    const analysis: unknown = JSON.parse(new TextDecoder().decode(response.Body));
 
     await db.videoFile.update({
       where: { key },
@@ -127,7 +126,7 @@ export async function POST(req: Request) {
     return NextResponse.json({
       analysis,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Analysis error: ", error);
     return NextResponse.json(
       { error: "Internal server error" },

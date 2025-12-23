@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { registerUser } from "~/actions/auth";
-import { signupSchema, SignupSchema } from "~/schemas/auth";
+import { signupSchema, type SignupSchema } from "~/schemas/auth";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -46,7 +46,7 @@ export default function SignupPage() {
       } else {
         setError("Failed to sign in");
       }
-    } catch (error) {
+    } catch {
       setError("Something went wrong");
     } finally {
       setLoading(false);
