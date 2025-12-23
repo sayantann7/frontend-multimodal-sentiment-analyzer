@@ -10,9 +10,13 @@ import { db } from "~/server/db";
 export default async function HomePage() {
   const session = await auth();
 
+  if (!session?.user?.id) {
+    return null;
+  }
+
   const quota = await db.apiQuota.findUniqueOrThrow({
     where: {
-      userId: session?.user.id,
+      userId: session.user.id,
     },
   });
 
